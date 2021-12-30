@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FirstBankOfSuncoast
 {
@@ -64,7 +65,111 @@ namespace FirstBankOfSuncoast
 
         static void Main(string[] args)
         {
+            var transactions = new List<Transaction>();
+            // var date = new DateTime; TBD
             DisplayGreeting();
+            var userChoice = Console.ReadLine();
+            var keepGoing = true;
+            var transaction = new Transaction();
+
+            while (keepGoing)
+            {
+                if (userChoice == "7")
+                {
+                    keepGoing = false;
+                    Console.WriteLine("Thank you for using Suncoast! \n\n");
+                    break;
+                }
+
+                else if (userChoice == "1")
+                {
+                    transaction.Date = DateTime.Now;
+                    transaction.Type = "Deposit";
+                    transaction.Account = "Checking";
+                    transaction.Amount = PromptForInteger("Amount: $ ");
+
+                    transactions.Add(transaction);
+
+                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                    Console.WriteLine($"Date: {DateTime.Now}");
+                    Console.WriteLine($"Transaction: {transaction.Type}");
+                    Console.WriteLine($"Account: {transaction.Account}");
+                    Console.WriteLine($"Amount: {transaction.Amount}");
+                    Console.WriteLine($"Current Balance: TBD\n");
+
+                    Console.WriteLine("\n\nThank you for banking with us!");
+
+                }
+
+                else if (userChoice == "2")
+                {
+                    transaction.Date = DateTime.Now;
+                    transaction.Type = "Deposit";
+                    transaction.Account = "Checking";
+                    transaction.Amount = PromptForInteger("Amount: $ ");
+
+                    transactions.Add(transaction);
+
+                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                    Console.WriteLine($"Date: {DateTime.Now}");
+                    Console.WriteLine($"Transaction: {transaction.Type}");
+                    Console.WriteLine($"Account: {transaction.Account}");
+                    Console.WriteLine($"Amount: {transaction.Amount}");
+                    Console.WriteLine($"Current Balance: TBD\n");
+
+                    Console.WriteLine("\n\nThank you for banking with us!");
+                }
+
+                else if (userChoice == "3")
+                {
+
+                }
+
+                else if (userChoice == "4")
+                {
+                    transaction.Date = DateTime.Now;
+                    transaction.Type = "Withdraw";
+                    transaction.Account = "Savings";
+                    transaction.Amount = PromptForInteger("Amount: $ ");
+
+                    transactions.Add(transaction);
+
+                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                    Console.WriteLine($"Date: {DateTime.Now}");
+                    Console.WriteLine($"Transaction: {transaction.Type}");
+                    Console.WriteLine($"Account: {transaction.Account}");
+                    Console.WriteLine($"Amount: {transaction.Amount}");
+                    Console.WriteLine($"Current Balance: TBD\n");
+
+                    Console.WriteLine("\n\nThank you for banking with us!");
+                }
+
+                else if (userChoice == "5")
+                {
+                    transaction.Date = DateTime.Now;
+                    transaction.Type = "Withdraw";
+                    transaction.Account = "Savings";
+                    transaction.Amount = PromptForInteger("Amount: $ ");
+
+                    transactions.Add(transaction);
+
+                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                    Console.WriteLine($"Date: {DateTime.Now}");
+                    Console.WriteLine($"Transaction: {transaction.Type}");
+                    Console.WriteLine($"Account: {transaction.Account}");
+                    Console.WriteLine($"Amount: {transaction.Amount}");
+                    Console.WriteLine($"Current Balance: TBD\n");
+
+                    Console.WriteLine("\n\nThank you for banking with us!");
+                }
+
+                else if (userChoice == "6")
+                {
+
+                }
+
+            }
+
         }
     }
 }
