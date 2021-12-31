@@ -128,7 +128,7 @@ namespace FirstBankOfSuncoast
                 else if (userChoice == "4")
                 {
                     transaction.Date = DateTime.Now;
-                    transaction.Type = "Withdraw";
+                    transaction.Type = "Deposit";
                     transaction.Account = "Savings";
                     transaction.Amount = PromptForInteger("Amount: $ ");
 
