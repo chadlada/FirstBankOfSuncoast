@@ -91,7 +91,7 @@ namespace FirstBankOfSuncoast
                     transactions.Add(transaction);
 
                     Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
-                    Console.WriteLine($"Date: {DateTime.Now}");
+                    Console.WriteLine($"Date: {transaction.Date}");
                     Console.WriteLine($"Transaction: {transaction.Type}");
                     Console.WriteLine($"Account: {transaction.Account}");
                     Console.WriteLine($"Amount: {transaction.Amount}");
@@ -122,7 +122,15 @@ namespace FirstBankOfSuncoast
 
                 else if (userChoice == "3")
                 {
+                    foreach (var transaction in transactions)
+                    {
+                        Console.WriteLine($"Date: {transaction.Date}, Type: {transaction.Type}, Account: {transaction.Account}, Amount: {transaction.Amount}");
+                    }
 
+                    if (transactions == null)
+                    {
+                        Console.WriteLine("$There are no transactions in your {transaction.Account}");
+                    }
                 }
 
                 else if (userChoice == "4")
