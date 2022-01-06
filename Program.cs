@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace FirstBankOfSuncoast
 {
     class Transaction
     {
-        public DateTime Date { get; set; }
         public string Type { get; set; }
         public string Account { get; set; }
         public int Amount { get; set; }
@@ -56,7 +60,7 @@ namespace FirstBankOfSuncoast
             }
             else
             {
-                //Console.WriteLine("This is not a valid entry. Action cancelled.");
+                Console.WriteLine("Sorry, that isn't a valid input, I'm using 0 as your answer.");
                 return 0;
             }
         }
@@ -66,14 +70,34 @@ namespace FirstBankOfSuncoast
         static void Main(string[] args)
         {
             var transactions = new List<Transaction>();
-            // var date = new DateTime; TBD
-            DisplayGreeting();
-            var userChoice = Console.ReadLine();
-            var keepGoing = true;
             var transaction = new Transaction();
+            var keepGoing = true;
+
+            if (File.Exists("transactions.csv"))
+
+            {
+                var fileReader = new StreamReader("transactions.csv");
+
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+
+                {
+                    HasHeaderRecord = true,
+                };
+
+                var csvReader = new CsvReader(fileReader, config);
+
+                transactions = csvReader.GetRecords<Transaction>().ToList();
+                Console.WriteLine(transactions);
+
+            }
+
+
 
             while (keepGoing)
             {
+                DisplayGreeting();
+                var userChoice = Console.ReadLine();
+
                 if (userChoice == "7")
                 {
                     keepGoing = false;
@@ -83,67 +107,104 @@ namespace FirstBankOfSuncoast
 
                 else if (userChoice == "1")
                 {
-                    transaction.Date = DateTime.Now;
                     transaction.Type = "Deposit";
                     transaction.Account = "Checking";
                     transaction.Amount = PromptForInteger("Amount: $ ");
 
                     transactions.Add(transaction);
+                    int receiptCheckingBalance = ComputeCheckingBalance(transactions);
+
 
                     Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
-                    Console.WriteLine($"Date: {transaction.Date}");
+                    Console.WriteLine("Transaction Approved\n");
                     Console.WriteLine($"Transaction: {transaction.Type}");
                     Console.WriteLine($"Account: {transaction.Account}");
                     Console.WriteLine($"Amount: {transaction.Amount}");
-                    Console.WriteLine($"Current Balance: TBD\n");
+                    // Console.WriteLine($"Balance: ${checkingBalance}");
 
                     Console.WriteLine("\n\nThank you for banking with us!");
-
                 }
 
                 else if (userChoice == "2")
                 {
-                    transaction.Date = DateTime.Now;
-                    transaction.Type = "Deposit";
+                    transaction.Type = "Withdraw";
                     transaction.Account = "Checking";
                     transaction.Amount = PromptForInteger("Amount: $ ");
 
-                    transactions.Add(transaction);
+                    //- Check balance report for available funds
+                    //- Tally all transaction amounts through the new variable amount from savings account running balance (var checkingBalance).
+                    //- Deduct transaction amount from balance
+                    var checkingBalance = ComputeCheckingBalance(transactions);
 
-                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
-                    Console.WriteLine($"Date: {DateTime.Now}");
-                    Console.WriteLine($"Transaction: {transaction.Type}");
-                    Console.WriteLine($"Account: {transaction.Account}");
-                    Console.WriteLine($"Amount: {transaction.Amount}");
-                    Console.WriteLine($"Current Balance: TBD\n");
+                    var withdrawApproval = transaction.Amount - checkingBalance;
 
-                    Console.WriteLine("\n\nThank you for banking with us!");
+                    if (withdrawApproval > 0)
+
+                    {
+                        //If negative balance is >0 = insufficient funds:
+
+                        //- Print Receipt
+                        //- cancel transaction
+                        Console.WriteLine($"Transaction cancelled due to insufficient funds.\n");
+                        Console.WriteLine("\n######## -RECEIPT- ########\n");
+                        Console.WriteLine("**Transaction Declined**");
+                        Console.WriteLine("Reason: Insufficient Funds\n");
+                        Console.WriteLine($"Account: {transaction.Account}");
+                        Console.WriteLine($"Transaction: {transaction.Type}");
+                        Console.WriteLine($"Amount: ${transaction.Amount}");
+                        Console.WriteLine($"Balance: ${checkingBalance}\n");
+                        Console.WriteLine("\nThank you for banking with First Bank of Suncoast\n");
+                    }
+
+                    //If positive balance is <=0 = approved:
+                    else
+                    {
+
+                        Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                        Console.WriteLine("Transaction Approved");
+                        Console.WriteLine($"Transaction: {transaction.Type}");
+                        Console.WriteLine($"Account: {transaction.Account}");
+                        Console.WriteLine($"Amount: {transaction.Amount}");
+                        Console.WriteLine($"Current Balance: TBD\n");
+
+                        Console.WriteLine("\n\nThank you for banking with us!");
+                    }
                 }
 
                 else if (userChoice == "3")
                 {
-                    foreach (var transaction in transactions)
                     {
-                        Console.WriteLine($"Date: {transaction.Date}, Type: {transaction.Type}, Account: {transaction.Account}, Amount: {transaction.Amount}");
-                    }
+                        var statementChecking = transactions.Where(transaction => transaction.Account == "Checking");
 
-                    if (transactions == null)
-                    {
-                        Console.WriteLine("$There are no transactions in your {transaction.Account}");
+                        foreach (var checkingTransaction in statementChecking)
+                        {
+                            //- Console.WriteLine the line listing each transaction
+                            //- loop generating the following linelisted:
+                            //- Account, Transaction, Amount
+                            Console.WriteLine($"\n{checkingTransaction.Account}, {checkingTransaction.Type}, ${checkingTransaction.Amount}");
+                        }
+
+                        var checkingBalance = ComputeCheckingBalance(transactions);
+
+                        //- Tally transactions to determine balance.
+                        //- Console.WriteLine the Balance: $
+                        Console.WriteLine($"\nYour checking account balance is ${checkingBalance}\n\n");
+                        Console.WriteLine("Thank you for banking with First Bank of Suncoast");
+                        // - Return to menu
+
                     }
                 }
-
                 else if (userChoice == "4")
                 {
-                    transaction.Date = DateTime.Now;
                     transaction.Type = "Deposit";
                     transaction.Account = "Savings";
                     transaction.Amount = PromptForInteger("Amount: $ ");
 
                     transactions.Add(transaction);
 
+                    int savingsBalance = ComputeSavingsBalance(transactions);
+
                     Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
-                    Console.WriteLine($"Date: {DateTime.Now}");
                     Console.WriteLine($"Transaction: {transaction.Type}");
                     Console.WriteLine($"Account: {transaction.Account}");
                     Console.WriteLine($"Amount: {transaction.Amount}");
@@ -154,30 +215,55 @@ namespace FirstBankOfSuncoast
 
                 else if (userChoice == "5")
                 {
-                    transaction.Date = DateTime.Now;
                     transaction.Type = "Withdraw";
                     transaction.Account = "Savings";
                     transaction.Amount = PromptForInteger("Amount: $ ");
 
-                    transactions.Add(transaction);
+                    int savingsBalance = ComputeSavingsBalance(transactions);
 
-                    Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
-                    Console.WriteLine($"Date: {DateTime.Now}");
-                    Console.WriteLine($"Transaction: {transaction.Type}");
-                    Console.WriteLine($"Account: {transaction.Account}");
-                    Console.WriteLine($"Amount: {transaction.Amount}");
-                    Console.WriteLine($"Current Balance: TBD\n");
+                    var withdrawApproval = transaction.Amount - savingsBalance;
 
-                    Console.WriteLine("\n\nThank you for banking with us!");
+                    if (withdrawApproval > 0)
+                    {
+                        Console.WriteLine("\n\n####### -RECEIPT- #######\n\n");
+                        Console.WriteLine($"Transaction: {transaction.Type}");
+                        Console.WriteLine($"Account: {transaction.Account}");
+                        Console.WriteLine($"Amount: {transaction.Amount}");
+                        Console.WriteLine($"Current Balance: TBD\n");
+
+                        Console.WriteLine("\n\nThank you for banking with us!");
+                    }
+
+                    else if (userChoice == "6")
+                    {
+
+                    }
+
+                    var fileWriter = new StreamWriter("transactions.csv");
+                    var csvWriter = new CsvWriter(fileWriter, CultureInfo.InvariantCulture);
+                    csvWriter.WriteRecords(transactions);
+                    fileWriter.Close();
                 }
-
-                else if (userChoice == "6")
-                {
-
-                }
-
             }
+            static int ComputeSavingsBalance(List<Transaction> transactions)
+            {
+                //Savings Balance
+                var totalSavingsDeposits = transactions.Where(transaction => transaction.Account == "Savings" && transaction.Type == "Deposit").Sum(transaction => transaction.Amount);
+                var totalSavingsWithdraw = transactions.Where(transaction => transaction.Account == "Savings" && transaction.Type == "Withdraw").Sum(transaction => transaction.Amount);
+                var savingsBalance = totalSavingsDeposits - totalSavingsWithdraw;
+                return savingsBalance;
+            }
+            static int ComputeCheckingBalance(List<Transaction> transactions)
+            {
+                var receiptCheckingDeposits = transactions.Where(transaction => transaction.Account == "Checking" && transaction.Type == "Deposit").Sum(transaction => transaction.Amount);
+                var receiptCheckingWithdraw = transactions.Where(transaction => transaction.Account == "Checking" && transaction.Type == "Withdraw").Sum(transaction => transaction.Amount);
+                var receiptCheckingBalance = receiptCheckingDeposits - receiptCheckingWithdraw;
+
+                return receiptCheckingBalance;
+            }
+
 
         }
     }
+
 }
